@@ -1,0 +1,110 @@
+#!/bin/bash
+
+#this script helps to create and compile a c++  program using BASH and G++ as a compiler
+
+c_name=$1
+count=""
+
+edit () {
+	vim ${c_name}.cpp
+}
+
+compile () {
+	g++ -Wno-deprecated -o "${c_name}.out" "${c_name}.cpp"
+}
+
+execute () {
+	if [[ -e ${c_name}.out ]]; then
+		 ./${c_name}.out
+	else
+		echo "The binary file does not exist. Please compile the program"
+	fi
+}
+
+#this catches if there is option comes with the program, this will be useful for existing program
+if [[ "$#" -gt 1 ]]; then
+	cases="$1"
+	cycles=${#cases}
+	starts=0
+	if [[ -d "$2" ]]; then
+		c_name=$2
+		cd $c_name
+		while [[ starts -lt cycles ]]; do
+			case ${cases:starts:1} in
+				e)	edit
+					#echo "Edit is done"
+					;;
+				c)	compile
+					#echo "Compile is done"
+					;;
+				x)	execute
+					#echo "Execute is done"
+					;;
+			esac
+			((++starts))
+		done
+		exit
+	else
+		echo "The program $2 does not exist"
+		exit
+	fi
+fi
+			
+#catch if there is no program name given and exit
+if [[ ! $1 ]]; then
+	echo "Please write the name of your c-program."
+	exit
+fi
+
+
+#checking if the directory already exist
+if [[ -d $1 ]]; then
+	while [[ -d $1$count ]];do
+		((++count))	
+	done
+	if (( $count == 1 )); then
+		echo -e "Directory $1 exist. Can I create $1$count? (y/n)"
+	else
+		count1=$((count-1))
+		echo -e "Directory $1 through directory $1$count1 exist. Can I create $1$count? (y/n)"
+	fi
+	read 
+	if [[ $REPLY == y ]];then
+		c_name="$1$count"
+	else 
+		echo "Try a new name. Tschuss!"
+		exit 0
+	fi
+fi
+
+mkdir "$c_name"
+cd "$c_name"
+
+#writing the script here
+edit
+
+#compiling and building the source code using gcc
+if [[ $? -eq 0 ]]; then
+	chmod 755 ${c_name}.cpp
+	while [[ ! -e ${c_name}.out ]]; do
+		compile
+		if [[ $? -eq  1 ]]; then
+			echo "Encountered syntax error. Do you want to edit code and recompile?:y/n"
+			read
+				if [[ $REPLY == n ]]; then
+					exit 1
+				elif [[ $REPLY == y ]]; then
+					edit
+				else
+					echo "Undefined character. We are exiting this compilation"
+					exit 1
+				fi
+		fi
+	done	
+	execute	
+	#cd ..
+	exit 0
+else 
+	echo "Code was not written successfully" >&2
+	exit 1
+fi
