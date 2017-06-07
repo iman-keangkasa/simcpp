@@ -6,5 +6,5 @@ syntax: simcpp [OPTION] CPP_PROJECT_NAME.
 		OPTION:  
 e - edit the cpp source code.   
 c - compile the cpp source code.  
-p - compile the cpp source code using C++11 standard
+p - compile the cpp source code using C++11 standard  
 x - execute the cpp output file.  
