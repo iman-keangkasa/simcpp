@@ -15,6 +15,7 @@ compile () {
 
 compile_c11 () {
 	g++ -std=C++11 -Wno-deprecated -o "${c_name}.out" "${c_name}.cpp"
+}
 
 execute () {
 	if [[ -e ${c_name}.out ]]; then
